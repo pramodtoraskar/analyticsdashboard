@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+      <meta name="viewport" content="width=device-width"/>
+      <link rel="shortcut icon" type="image/x-icon" href="{{ site.baseurl }}/images/favicon.ico" />
+      <link rel="stylesheet" href="{{ site.baseurl }}/css/public_analytics.css">
+      <title>{{ title }}</title>
+
+      <!--[if lte IE 9]>
+      <script src="js/vendor/aight.v2.min.js"></script>
+      <![endif]-->
+
+      <script src="{{ site.baseurl }}/js/vendor/d3.v3.min.js"></script>
+      <script src="{{ site.baseurl }}/js/vendor/q.min.js"></script>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <script src="{{ site.baseurl }}/js/jquery.min.js"></script>
+      
+      <link rel="stylesheet" href="{{ site.baseurl }}/css/nv.d3.css">
+      
+      <script src="{{ site.baseurl }}/js/nv.d3.js"></script>
+      <script src="{{ site.baseurl }}/js/jquery-ui.min.js"></script>
+
+      <link rel="stylesheet" href="{{ site.baseurl }}/css/jquery-ui.css" />
+      
+   </head>
+   <body>
+      <header>
+         <div class="inner clearfix">
+            <h1>
+               <img style="vertical-align: middle;" alt="redhat logo" src="{{ site.baseurl }}/images/rh-logo.png">
+               <img style="vertical-align: middle;" alt="vertical-line" src="{{ site.baseurl }}/images/vertical-line.png">
+               <a href="/"><img style="vertical-align: middle;" alt="text analytics dashboard" src="{{ site.baseurl }}/images/text-analytics dashboard.png"></a>           		
+               <img style="vertical-align: middle;" alt="text beta" src="{{ site.baseurl }}/images/text-beta.png">
+            </h1>
+            <div class="agency-selector-wrap">
+               <form>
+                  {% for site_obj in site.site_list_obj %}
+	                  {% if loop.first %}
+	                  <select id="agency-selector" name="agency-selector" class="agency-selector-cls" title="Domain Selection Dropdown">
+	                     {% endif %}
+	                     <option value="{{ site_obj }}">{{ loop.key }}</option>
+	                     {% if loop.last %}
+	                  </select>
+	                  {% endif %}
+                  {% endfor %}
+                  <a href="#" id="sandwichmenu"><img alt="redhat logo" src="{{ site.baseurl }}/images/menu-sandwich.png" style="vertical-align: middle;"></a>     
+               </form>
+            </div>
+         </div>
+      </header>
+      <div class="container">
+         <div id="main_data">
+         
+            <!-- Unique visitors -->
+            <section id="realtime" class="yesterday_metrics"
+               data-block="realtime"               
+               data-source="{{ data_url }}/0/realtime.json">
+               <h2 id="current_visitors" class="data">...</h2>
+               <div class="chart_subtitle">Unique visitors on {{ site.site_name|lower }} yesterday.</div>
+            </section>
+            <section id="realtime-7" class="7day_metrics displaynone"
+               data-block="realtime"               
+               data-source="{{ data_url }}/7/realtime.json">
+               <h2 id="current_visitors" class="data">...</h2>
+               <div class="chart_subtitle">Unique visitors on {{ site.site_name|lower }} over the last 7 days.</div>
+            </section>
+            <section id="realtime-30" class="30day_metrics displaynone"
+               data-block="realtime"               
+               data-source="{{ data_url }}/30/realtime.json">
+               <h2 id="current_visitors" class="data">...</h2>
+               <div class="chart_subtitle">Unique visitors on {{ site.site_name|lower }} over the last 30 days.</div>
+            </section>
+            <!-- Unique visitors end -->
+            
+            <!-- ######################################################################################################## -->
+            <!-- Time Series -->
+            <section class="section_headline visits_today">
+               <h3>Visits Yesterday</h3>
+               <h4>Eastern Time</h4>
+            </section>
+            <div id="grp_container" class="yesterday_metrics">
+	            <section id="time_series" class="chart_container with-3d-shadow with-transitions" 
+	               role="tabpanel"
+	               data-source="{{ data_url }}/0/yesterday.json"
+	               bar_graph_label="Yesterday"
+	               line_graph_label="Day before yesterday">
+	               <svg class="data time-series"></svg>
+	            </section>
+            </div>
+            <div id="grp_container_7" class="7day_metrics">
+	            <section id="time_series_7" class="chart_container with-3d-shadow with-transitions"
+	               role="tabpanel"
+	               data-source="{{ data_url }}/7/yesterday.json"
+	               bar_graph_label="Last 7 days"
+	               line_graph_label="Previous 7 days">
+	               <svg class="data time-series"></svg>
+	            </section>
+            </div>
+            <div id="grp_container_30" class="30day_metrics">
+	            <section id="time_series_30" class="chart_container with-3d-shadow with-transitions"
+	               role="tabpanel"
+	               data-source="{{ data_url }}/30/yesterday.json"
+	               bar_graph_label="Last 30 days"
+	               line_graph_label="Previous 30 days">
+	               <svg class="data time-series"></svg>
+	            </section>
+            </div>
+            
+            <!-- Time Series end -->
+            <!-- ######################################################################################################## -->
+      
+            <!-- Past Visits -->
+            <!-- 
+            <section class="section_headline">
+               <h3>Visits in the Past Days</h3>
+            </section>
+            <section id="sec_total_visitors" class="yesterday_metrics section_subheadline">
+               There were <span id="total_visitors" class="data">...</span> visits over yesterday.
+            </section>
+            <section id="sec_total_visitors-7" class="7day_metrics section_subheadline">
+               There were <span id="total_visitors-7" class="data">...</span> visits over the past 7 days.
+            </section>
+            <section id="sec_total_visitors-30" class="30day_metrics section_subheadline">
+               There were <span id="total_visitors-30" class="data">...</span> visits over the past 30 days.
+            </section>             -->
+            <!-- Past Visits end -->
+            
+            <section class="section_headline"><h3>Visits in the Past Days</h3></section>
+            <!-- Devices -->
+            <section id="devices" class="yesterday_metrics three_column"
+               data-block="devices"
+               data-source="{{ data_url }}/0/devices.json">
+               <h4>Devices</h4>
+               <div class="barBlock">
+                  <figure id="chart_device_types">
+                     <div class="data bar-chart"></div>
+                  </figure>
+               </div>
+            </section>
+            <section id="devices-7" class="7day_metrics three_column displaynone"
+               data-block="devices_7"
+               data-source="{{ data_url }}/7/devices.json">
+               <h4>Devices</h4>
+               <div class="barBlock">
+                  <figure id="chart_device_types">
+                     <div class="data bar-chart"></div>
+                  </figure>
+               </div>
+            </section>
+            <section id="devices-30" class="30day_metrics three_column displaynone"
+               data-block="devices_30"
+               data-source="{{ data_url }}/30/devices.json">
+               <h4>Devices</h4>
+               <div class="barBlock">
+                  <figure id="chart_device_types">
+                     <div class="data bar-chart"></div>
+                  </figure>
+               </div>
+            </section> 
+            <!-- Devices end -->
+            
+            <!-- Browsers -->
+            <section id="browsers" class="yesterday_metrics three_column">
+               <h4>Browsers</h4>
+               <figure id="chart_browsers"
+                  data-block="browsers"
+                  data-source="{{ data_url }}/0/browsers.json">
+                  <div class="data bar-chart"></div>
+               </figure>
+               <figure id="chart_ie"
+                  data-block="ie"
+                  data-source="{{ data_url }}/0/ie.json">
+                  <h4>Internet Explorer</h4>
+                  <div class="data bar-chart"></div>
+               </figure>
+            </section>
+            <section id="browsers-7" class="7day_metrics three_column displaynone"
+               style="display: none">
+               <h4>Browsers</h4>
+               <figure id="chart_browsers-7"
+                  data-block="browsers"
+                  data-source="{{ data_url }}/7/browsers.json">
+                  <div class="data bar-chart"></div>
+               </figure>
+               <figure id="chart_ie-7"
+                  data-block="ie"
+                  data-source="{{ data_url }}/7/ie.json">
+                  <h4>Internet Explorer</h4>
+                  <div class="data bar-chart"></div>
+               </figure>
+            </section>
+            <section id="browsers-30" class="30day_metrics three_column displaynone">
+               <h4>Browsers</h4>
+               <figure id="chart_browsers-30"
+                  data-block="browsers"
+                  data-source="{{ data_url }}/30/browsers.json">
+                  <div class="data bar-chart"></div>
+               </figure>
+               <figure id="chart_ie-30"
+                  data-block="ie"
+                  data-source="{{ data_url }}/30/ie.json">
+                  <h4>Internet Explorer</h4>
+                  <div class="data bar-chart"></div>
+               </figure>
+            </section> 
+            <!-- Browsers end -->
+            
+            <!-- OS -->
+            <section id="operating_systems" class="yesterday_metrics three_column">
+               <h4>Operating Systems</h4>
+               <figure id="chart_os"
+                  data-block="os"
+                  data-source="{{ data_url }}/0/os.json">
+                  <div class="data bar-chart">
+                  </div>
+               </figure>
+               <!-- 
+                  <figure id="chart_windows"
+                     data-block="windows"
+                     data-source="{{ data_url }}/windows.json">
+                     <h4>Windows</h4>
+                     <div class="data bar-chart">
+                     </div>
+                  </figure> -->
+            </section>
+            <section id="operating_systems-7" class="7day_metrics three_column displaynone">
+               <h4>Operating Systems</h4>
+               <figure id="chart_os"
+                  data-block="os"
+                  data-source="{{ data_url }}/7/os.json">
+                  <div class="data bar-chart">
+                  </div>
+               </figure>
+               <!-- 
+                  <figure id="chart_windows"
+                     data-block="windows"
+                     data-source="{{ data_url }}/windows.json">
+                     <h4>Windows</h4>
+                     <div class="data bar-chart">
+                     </div>
+                  </figure> -->
+            </section>
+            <section id="operating_systems-30" class="30day_metrics three_column displaynone">
+               <h4>Operating Systems</h4>
+               <figure id="chart_os"
+                  data-block="os"
+                  data-source="{{ data_url }}/30/os.json">
+                  <div class="data bar-chart">
+                  </div>
+               </figure>
+               <!-- 
+                  <figure id="chart_windows"
+                     data-block="windows"
+                     data-source="{{ data_url }}/windows.json">
+                     <h4>Windows</h4>
+                     <div class="data bar-chart">
+                     </div>
+                  </figure> -->
+            </section> 
+            <!-- OS end-->
+            
+            <div style="clear: both"></div>
+            <section id="visit_loc_yesterday" class="yesterday_metrics section_headline">
+               <h3>Visitor Locations Yesterday (Top 10)</h3>
+            </section>
+            <section id="visit_loc_7days" class="7day_metrics section_headline displaynone">
+               <h3>Visitor Locations Last 7 (Top 10)</h3>
+            </section>
+            <section id="visit_loc_30days" class="30day_metrics section_headline displaynone">
+               <h3>Visitor Locations Last 30 (Top 10)</h3>
+            </section>
+            
+            <!-- Cities --> 
+            <section id="cities" class="yesterday_metrics three_column loaded"
+               data-block="cities"
+               data-source="{{ data_url }}/0/top-cities-realtime.json">
+               <h4>Cities</h4>
+               <figure id="chart_top-cities-90-days">
+                  <div class="data bar-chart">
+                  </div>
+               </figure>
+            </section>
+            <section id="cities-7" class="7day_metrics three_column loaded  displaynone"
+               data-block="cities"
+               data-source="{{ data_url }}/7/top-cities-realtime.json">
+               <h4>Cities</h4>
+               <figure id="chart_top-cities-90-days">
+                  <div class="data bar-chart">
+                  </div>
+               </figure>
+            </section>
+            <section id="cities-30" class="30day_metrics three_column loaded displaynone"
+               data-block="cities"
+               data-source="{{ data_url }}/30/top-cities-realtime.json">
+               <h4>Cities</h4>
+               <figure id="chart_top-cities-90-days">
+                  <div class="data bar-chart">
+                  </div>
+               </figure>
+            </section>
+            <!-- Cities end -->
+            
+            <!--Countries --> 
+            <section id="countries" class="yesterday_metrics three_column loaded"
+               data-block="countries"
+               data-source="{{ data_url }}/0/top-countries-realtime.json">
+               <h4>Countries</h4>
+               <figure id="chart_countries">
+                  <div class="data bar-chart">
+                  </div>
+               </figure>
+            </section>
+            <section id="countries-7" class="7day_metrics three_column loaded displaynone"
+               data-block="countries"
+               data-source="{{ data_url }}/7/top-countries-realtime.json">
+               <h4>Countries</h4>
+               <figure id="chart_countries">
+                  <div class="data bar-chart">
+                  </div>
+               </figure>
+            </section>
+            <section id="countries-30" class="30day_metrics three_column loaded displaynone"
+               data-block="countries"
+               data-source="{{ data_url }}/30/top-countries-realtime.json">
+               <h4>Countries</h4>
+               <figure id="chart_countries">
+                  <div class="data bar-chart">
+                  </div>
+               </figure>
+            </section> 
+            <!--Countries end -->
+            
+            <!--Referrers -->
+            <section id="referrers" class="yesterday_metrics three_column loaded"
+               data-block="referrers"
+               data-source="{{ data_url }}/0/top-referrer-realtime.json">
+               <h4>Referrer</h4>
+               <figure id="chart_referrers">
+                  <div class="data bar-chart">
+                  </div>
+               </figure>
+            </section>
+            <section id="referrers-7" class="7day_metrics three_column loaded displaynone"
+               data-block="referrers"
+               data-source="{{ data_url }}/7/top-referrer-realtime.json">
+               <h4>Referrer</h4>
+               <figure id="chart_referrers">
+                  <div class="data bar-chart">
+                  </div>
+               </figure>
+            </section>
+            <section id="referrers-30" class="30day_metrics three_column loaded displaynone"
+               data-block="referrers"
+               data-source="{{ data_url }}/30/top-referrer-realtime.json">
+               <h4>Referrer</h4>
+               <figure id="chart_referrers">
+                  <div class="data bar-chart">
+                  </div>
+               </figure>
+            </section>
+            <!--Referrers end -->
+            
+            <!--             
+               <section class="three_column" id="countries">
+               <h4>Countries</h4>
+               <figure data-source="{{ data_url }}/top-countries-realtime.json" 
+               data-block="countries" 
+               id="chart_us" 
+               class="loaded">
+                <div class="data bar-chart">
+                 <div class="bin">
+                  <div class="label">United States</div>
+                  <div class="value">84.1%</div>
+                  <div class="bar" style="width: 84.1%;"></div>
+                 </div>
+                 <div class="bin">
+                  <div class="label">International</div>
+                  <div class="value">35.8%</div>
+                  <div class="bar" style="width: 35.8%;"></div>
+                  
+               <figure data-source="{{ data_url }}/top-countries-realtime.json" 
+               data-block="international_visits" 
+               id="chart_countries" 
+               class="loaded">
+               <h4>International</h4>
+               <div class="data bar-chart">
+               </div>
+               </figure>
+               </div> </div>  
+               </figure>
+               </section>
+               -->
+               
+         </div> 
+         <!--main_data end -->
+         
+         <div id="secondary_data">
+
+            <div class="tab_nav"> 
+	            <ul class="pills" role="tablist">
+	               <li><a class="underlinetoggle" id="tab-yesterday" role="tab" aria-selected="true">Yesterday</a></li>
+	               <li><a class="underlinetoggle" id="tab-7-day" role="tab" aria-selected="false" >7 Days</a></li>
+	               <li><a class="underlinetoggle" id="tab-30-day" role="tab" aria-selected="false">30 Days</a></li>
+	            </ul>
+            </div>   
+            <section id="top_100_table">            
+               <!-- see: http://heydonworks.com/practical_aria_examples/ -->
+               <h3>Top Pages</h3>
+               <div class="top_page_align">
+	               <figure class="yesterday_metrics top-pages" id="top-pages-realtime" role="tabpanel"
+	                  data-block="top-pages-realtime"
+	                  data-source="{{ data_url }}/0/top-pages-realtime.json">
+	                  <h5>
+	                     <em>Unique visitors on a single, specific page for {{ site.site_name|lower }} yesterday.</em>
+	                  </h5>
+	                  <div class="data bar-chart">
+	                  </div>
+	               </figure>
+	               <figure class="7day_metrics top-pages floatleft displaynone" id="top-pages-7-days" role="tabpanel"
+	                  data-block="top-pages"
+	                  data-source="{{ data_url }}/0/top-domains-7-days.json"
+	               style="display: none">
+	                  <h5>
+	                     <em>Unique visitors on a single, specific page for {{ site.site_name|lower }} over the last 7 days.</em>
+	                  </h5>
+	                  <div class="data bar-chart">
+	                  </div>
+	               </figure>
+	               <figure class="30day_metrics top-pages floatleft displaynone" id="top-pages-30-days" role="tabpanel"
+	                  data-block="top-pages"
+	                  data-source="{{ data_url }}/0/top-domains-30-days.json"
+	               style="display: none">
+	                  <h5>
+	                     <em>Unique visitors on a single, specific page for {{ site.site_name|lower }} over the last 30 days.</em>
+	                  </h5>
+	                  <div class="data bar-chart">
+	                  </div>
+	               </figure>
+               </div>
+            </section>
+            
+            <section id="top_downloads_table">
+               <h3>Top Downloads</h3>
+               <div>
+	               <div id="sec-top-downloads" class="yesterday_metrics">
+	                  <h5><em>Total file downloads yesterday on {{ site.site_name|lower }}.</em></h5>
+	                  <figure class="yesterday_metrics loaded"  id="top-downloads"
+	                     data-source="{{ data_url }}/0/top-downloads-yesterday.json" 
+	                     data-block="top-downloads">
+	                     <div class="data bar-chart"></div>
+	                  </figure>
+	               </div>
+	               <div id="sec-top-downloads-7" class="7day_metrics displaynone">
+	                  <h5>
+	                  	<em>Total file downloads over the last 7 days on {{ site.site_name|lower }}.</em>
+	                  </h5>
+	                  <figure class="loaded"  id="top-downloads-7"
+	                     data-source="{{ data_url }}/0/top-downloads-yesterday.json" 
+	                     data-block="top-downloads"
+	               style="display: none">
+	                     <div class="data bar-chart"></div>
+	                  </figure>
+	               </div>
+	               <div id="sec-top-downloads-30" class="30day_metrics displaynone">
+	                  <h5>
+	                  	<em>Total file downloads over the last 30 days on {{ site.site_name|lower }}.</em>
+	                  </h5>
+	                  <figure class="loaded"  id="top-downloads-30"
+	                     data-source="{{ data_url }}/0/top-downloads-yesterday.json" 
+	                     data-block="top-downloads">
+	                     <div class="data bar-chart"></div>
+	                  </figure>
+	               </div>
+               </div>
+            </section>
+            
+         </div>
+         <section id="explanation">
+            <h3>About this Site</h3>
+            <p>
+               This data provides a window into how visitors are interacting with the {{ site.site_name|lower }}. The data comes from a unified Adobe Analytics account for Red Hat. This program helps the marketing team understand how visitors find, access, and use Red Hat services online.
+            </p>
+            <p>
+               Only <a target="_blank" href="https://www.redhat.com/en">redhat.com</a> and respective participating websites are represented in this data. This aggregate data is only a representative sample of web traffic on {{ site.site_name|lower }}.
+            </p>
+            <p>
+               <strong>Top Page data:</strong> "Yesterday" data includes traffic to a specific, single page&mdash;whereas "7 Days" and "30 Days" data includes traffic to a single page for last 7 days & 30 days respectively and all pages within <a target="_blank" href="https://www.redhat.com/en">redhat.com</a> and respective participating websites.
+            </p>
+         </section>
+         
+         <section id="data_download">
+            <h3>Download the Data</h3>
+            <h4 class="updatecsv">Updated daily (CSV)</h4>
+            <ul id="download_yesterday_data" class="yesterday_metrics">
+               <li>
+                  <a href="{{ download_api_url }}/all-domains-yesterday-days.csv" class="download-data">Visits to all domains</a>
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/top-downloads-yesterday.csv" class="download-data">Top downloads</a>
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/devices-yesterday.csv" class="download-data">Desktop/mobile/tablet</a>
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/browsers-yesterday.csv" class="download-data">Web browsers</a>
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/ie-yesterday.csv" class="download-data">Versions of Internet Explorer</a>
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/os-yesterday.csv" class="download-data">Operating systems</a>
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/windows-yesterday.csv" class="download-data">Versions of Windows</a>
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/all-pages-yesterday.csv" class="download-data">All pages visitors are visiting</a>
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/top-countries-yesterday.json" class="download-data">Visitors per country</a> (JSON)
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/top-cities-yesterday.json" class="download-data">Visitors per city</a> (JSON)
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/realtime-yesterday.json" class="download-data">Total visitors online</a> (JSON) sdf
+               </li>
+            </ul>
+            <ul id="download_7_data" class="7day_metrics displaynone">
+               <li>
+                  <a href="{{ download_api_url }}/all-domains-7-days.csv" class="download-data">Visits to all domains</a>
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/top-downloads-7.csv" class="download-data">Top downloads</a>
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/devices-7.csv" class="download-data">Desktop/mobile/tablet</a>
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/browsers-7.csv" class="download-data">Web browsers</a>
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/ie-7.csv" class="download-data">Versions of Internet Explorer</a>
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/os-7.csv" class="download-data">Operating systems</a>
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/windows-7.csv" class="download-data">Versions of Windows</a>
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/all-pages-7.csv" class="download-data">All pages visitors are visiting</a>
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/top-countries-7.json" class="download-data">Visitors per country</a> (JSON)
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/top-cities-7.json" class="download-data">Visitors per city</a> (JSON)
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/realtime-7.json" class="download-data">Total visitors online</a> (JSON) sdf
+               </li>
+            </ul>
+            <ul id="download_30_data" class="30day_metrics displaynone">
+               <li>
+                  <a href="{{ download_api_url }}/all-domains-30-days.csv" class="download-data">Visits to all domains</a>
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/top-downloads-30.csv" class="download-data">Top downloads</a>
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/devices-30.csv" class="download-data">Desktop/mobile/tablet</a>
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/browsers-30.csv" class="download-data">Web browsers</a>
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/ie-30.csv" class="download-data">Versions of Internet Explorer</a>
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/os-30.csv" class="download-data">Operating systems</a>
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/windows-30.csv" class="download-data">Versions of Windows</a>
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/all-pages-30.csv" class="download-data">All pages visitors are visiting</a>
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/top-countries-30.json" class="download-data">Visitors per country</a> (JSON)
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/top-cities-30.json" class="download-data">Visitors per city</a> (JSON)
+               </li>
+               <li>
+                  <a href="{{ download_api_url }}/realtime-30.json" class="download-data">Total visitors online</a> (JSON) sdf
+               </li>
+            </ul>
+         </section>
+      </div>
+      <a href="javascript:void(0);" id="scroll" title="Scroll to Top" style="display: none;">Top<span></span></a>
+
+      <div id="dialog" class="displaynone">
+          <div class="modal-content">
+	          <div class="row">
+		          <div class="col s6">
+		              <a href=""><h4 class="rh-light-blue-text">Email Analytics</h4></a>
+		              <p class="black-text">Mauris non enim ultrices, euismod dui at, condimentum felis.</p>
+		          </div>
+		          <div class="col s6">
+			          <a href=""><h4 class="rh-light-orange-text">SEO Analytics</h4></a>
+			          <p class="black-text">Aliquam pretium dui at odio pretium sollicitudin.</p>
+		          </div>
+		          <div class="col s6">
+		              <a href=""><h4 class="rh-light-green-text">Webstore Analytics</h4></a>
+		              <p class="black-text">Donec nec urna feugiat, imperdiet elit quis, mattis est.</p>
+		          </div>
+		          <div class="col s6">
+		              <h4 class="rh-light-red-text"></h4>
+		              <p class="black-text"></p>
+		          </div>
+		      </div>
+		      <div class="row">
+		      </div>
+          </div>
+      </div>
+
+   </body>
+   <!--
+      IE detection, used to guide console formatting in subsequent include
+      -->
+   <script type="text/javascript">window._ie9 = false;</script>
+   <!--[if IE 9 ]>
+   <script type="text/javascript">window._ie9 = true;</script>
+   <![endif]-->
+   <script type="text/javascript">
+      window._ie10 = ("onpropertychange" in document && !!window.matchMedia);
+      window._ie11 = !!navigator.userAgent.match(/Trident\/7.0; rv 11/);
+      window._ie = window._ie9 || window._ie10 || window._ie11;
+   </script>
+   <script src="{{ site.baseurl }}/js/scroll.js"></script>
+   <script src="{{ site.baseurl }}/js/index.js"></script>   
+   <script src="{{ site.baseurl }}/js/loadbarlinechart.js"></script>
+   <script src="{{ site.baseurl }}/js/loadmetrics.min.js"></script>
+</html>
+
